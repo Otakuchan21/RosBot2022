@@ -10,7 +10,7 @@ normal_linear = 0.2
 detection_dist = 0.5
 
 # while avoiding an obstacle the rosbot will move back to be able to rotate
-avoid_linear = -0.05
+avoid_linear = -0.1
 avoid_angular = 1.5
 
 # divides the rplider scan into 12 section and keeps track of their order, measured distances and deviation costs
