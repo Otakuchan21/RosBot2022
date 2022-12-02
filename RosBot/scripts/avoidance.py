@@ -47,6 +47,8 @@ def ClearestPath(velocity):
                 elif(max(sector[1]) > best_sector["distance"]):
                     best_sector["distance"] = max(sector[1])
                     best_sector["destination"] = sector[0]
+            else:
+                print (sector, "is backkkkkk")
 
         # calculate the cost to the chosen orientation
         sector_cost = sector_costs[best_sector["destination"]]-sector_costs[goal]
@@ -54,11 +56,11 @@ def ClearestPath(velocity):
         # we change orientation whenever the clearest path is not forwards
         if (closest_dist!=0):
             if (sector_cost!= 0):
-                cost = abs(sector_cost)[0]
+                cost = abs(sector_cost)
             else:
                 cost = 1
             print(cost)
-            angular_velocity = ((sector_cost/cost)*avoid_angular)
+            angular_velocity = (sector_cost/[cost][0])*avoid_angular
             velocity = Steering(velocity, angular_velocity)
         else:
             velocity = MoveStraight(velocity,normal_linear)
@@ -73,7 +75,7 @@ def Steering(velocity, angular_velocity=0):
     velocity.angular.x = 0
     velocity.angular.y = 0
     velocity.angular.z = angular_velocity
-    print ("steer")
+
     return velocity
 
 # 
@@ -84,7 +86,7 @@ def MoveStraight(velocity, normal_linear):
     velocity.angular.x = 0
     velocity.angular.y = 0
     velocity.angular.z = 0
-    print("straight")
+
     return velocity
 
 def main():
