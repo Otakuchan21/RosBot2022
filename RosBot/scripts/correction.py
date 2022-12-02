@@ -42,8 +42,6 @@ class correction():
         pub.publish(self.msg)
 
 
-
-
 def main():
     rospy.init_node("correction")
     corr = correction()
