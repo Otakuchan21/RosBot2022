@@ -22,6 +22,7 @@ sector_costs = {"front_C": 0, "front_L": 1, "left_R": 2, "left_C": 3, "left_L": 
 def SectorScan(scan):
     # takes in the scan data and records the distance to an obstacle if it detects one
     for i, sector in enumerate(sectors):
+        print ("scanning in sector ", sector)
         sector_distances[sector] = [ x for x in scan.ranges[sector_angle*i : sector_angle*(i+1)] #looks at the data scanned within the range of each sector
                                         if x <= detection_dist and x != 'inf']        #records the distance to the obstacle if it is within the predefined collision range and not infinite
 
@@ -44,7 +45,7 @@ def ClearestPath(velocity):
                     best_sector["destination"] = sector[0]
             # check if it's the clearest path
             elif(max(sector[1]) > best_sector["distance"]):
-                best_sector["distance"] = best_sector(sector[1])
+                best_sector["distance"] = max(sector[1])
                 best_sector["destination"] = sector[0]
 
         # calculate the cost to the chosen orientation
