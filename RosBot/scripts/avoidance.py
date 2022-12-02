@@ -20,11 +20,12 @@ sector_distances = {"front_C":[], "front_L":[], "left_R":[], "left_C":[], "left_
 sector_costs = {"front_C": 0, "front_L": 1, "left_R": 2, "left_C": 3, "left_L": 4, "back_R": 5, "back_C": 6, "back_L": -5, "right_R": -4, "right_C": -3, "right_L": -2, "front_R": -1}
 
 def SectorScan(scan):
+    len(scan)
     # takes in the scan data and records the distance to an obstacle if it detects one
     for i, sector in enumerate(sectors):
         sector_distances[sector] = [ x for x in scan.ranges[sector_angle*i : sector_angle*(i+1)] #looks at the data scanned within the range of each sector
                                         if x <= detection_dist and x != 'inf']        #records the distance to the obstacle if it is within the predefined collision range and not infinite
-
+        
 def ClearestPath(velocity):
         # orients the rosbot so it wants to move towards the front and center
         goal = "front_C"
@@ -34,7 +35,7 @@ def ClearestPath(velocity):
 
         # for each sector it checks if the path is clear and the cost to determine the orientation
         for sector in sector_distances.items():
-            if "back" not in sector[0]:
+#            if "back" not in sector[0]:
                 sector_cost = abs(sector_costs[sector[0]]-sector_costs[goal])
                 # if an obstacle is detected we find a clearer path
                 if not len(sector[1]):
@@ -47,8 +48,7 @@ def ClearestPath(velocity):
                 elif(max(sector[1]) > best_sector["distance"]):
                     best_sector["distance"] = max(sector[1])
                     best_sector["destination"] = sector[0]
-            else:
-                print (sector, "is backkkkkk")
+
 
         # calculate the cost to the chosen orientation
         sector_cost = sector_costs[best_sector["destination"]]-sector_costs[goal]
@@ -91,7 +91,7 @@ def MoveStraight(velocity, normal_linear):
 
 def main():
     rospy.init_node("avoidance")
-    rospy.Subscriber("/scan", LaserScan,SectorScan)
+    rospy.Subscriber("/scan", LaserScan, SectorScan)
     pub = rospy.Publisher("/cmd_vel", Twist, queue_size = 1)
     vel = Twist()
     rate = rospy.Rate(10)
