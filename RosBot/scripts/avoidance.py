@@ -4,7 +4,7 @@ import rospy
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan
 
-normal_linear = 0.5
+normal_linear = 0.2
 
 # obstacles are detected if they are within this range
 detection_dist = 0.5
