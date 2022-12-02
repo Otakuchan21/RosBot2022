@@ -7,7 +7,7 @@ from sensor_msgs.msg import LaserScan
 normal_linear = 0.2
 
 # obstacles are detected if they are within this range
-detection_dist = 0.5
+detection_dist = 0.3
 
 # while avoiding an obstacle the rosbot will move back to be able to rotate
 avoid_linear = -0.1
