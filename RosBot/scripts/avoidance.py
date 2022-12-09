@@ -35,7 +35,7 @@ def ClearestPath(velocity):
         # for each sector it checks if the path is clear and the cost to determine the orientation
         for sector in sector_distances.items():
 #            if "back" not in sector[0]:
-                sector_cost = abs(sector_costs[sector[0]]-sector_costs[goal])
+                sector_cost = abs(sectzzor_costs[sector[0]]-sector_costs[goal])
                 # if an obstacle is detected we find a clearer path
                 if not len(sector[1]):
                     #checks if it's the cheapest path
@@ -54,7 +54,7 @@ def ClearestPath(velocity):
 
         # we change orientation whenever the clearest path is not forwards
         if (closest_dist!=0):
-            angular_velocity = (sector_cost)*avoid_angular
+            angular_velocity = (sector_cost/[abs(sector_cost) if sector_cost != 0 else 1])*avoid_angular
             velocity = Steering(velocity, angular_velocity)
         else:
             velocity = MoveStraight(velocity,normal_linear)
