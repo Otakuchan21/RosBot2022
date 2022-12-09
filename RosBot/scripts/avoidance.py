@@ -20,7 +20,6 @@ sector_distances = {"front_C":[], "front_L":[], "left_R":[], "left_C":[], "left_
 sector_costs = {"front_C": 0, "front_L": 1, "left_R": 2, "left_C": 3, "left_L": 4, "back_R": 5, "back_C": 6, "back_L": -5, "right_R": -4, "right_C": -3, "right_L": -2, "front_R": -1}
 
 def SectorScan(scan):
-    len(scan)
     # takes in the scan data and records the distance to an obstacle if it detects one
     for i, sector in enumerate(sectors):
         sector_distances[sector] = [ x for x in scan.ranges[sector_angle*i : sector_angle*(i+1)] #looks at the data scanned within the range of each sector
@@ -55,12 +54,7 @@ def ClearestPath(velocity):
 
         # we change orientation whenever the clearest path is not forwards
         if (closest_dist!=0):
-            if (sector_cost!= 0):
-                cost = abs(sector_cost)
-            else:
-                cost = 1
-            print(cost)
-            angular_velocity = (sector_cost/[cost][0])*avoid_angular
+            angular_velocity = (sector_cost/[abs(sector_cost) if sector_cost != 0 else 1][0])*avoid_angular
             velocity = Steering(velocity, angular_velocity)
         else:
             velocity = MoveStraight(velocity,normal_linear)
