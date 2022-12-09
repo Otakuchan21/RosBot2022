@@ -54,7 +54,7 @@ def ClearestPath(velocity):
 
         # we change orientation whenever the clearest path is not forwards
         if (closest_dist!=0):
-            angular_velocity = (sector_cost/[abs(sector_cost) if sector_cost != 0 else 1][0])*avoid_angular
+            angular_velocity = (sector_cost)*avoid_angular
             velocity = Steering(velocity, angular_velocity)
         else:
             velocity = MoveStraight(velocity,normal_linear)
