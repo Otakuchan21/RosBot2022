@@ -35,7 +35,7 @@ def ClearestPath(velocity):
         # for each sector it checks if the path is clear and the cost to determine the orientation
         for sector in sector_distances.items():
 #            if "back" not in sector[0]:
-                sector_cost = abs(sectzzor_costs[sector[0]]-sector_costs[goal])
+                sector_cost = abs(sector_costs[sector[0]]-sector_costs[goal])
                 # if an obstacle is detected we find a clearer path
                 if not len(sector[1]):
                     #checks if it's the cheapest path
