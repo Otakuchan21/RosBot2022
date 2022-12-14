@@ -32,7 +32,7 @@ class correction():
 def service_cb(request):
     c = correction()
     while not (abs(c.z_deg)<94.0 and c.z_deg>86.0):
-        print(c.z_deg)
+        #print(c.z_deg)
         if abs(c.z_deg) > 94.0:
             c.msg.linear.x = 0
             c.msg.angular.z = -0.5
@@ -45,7 +45,7 @@ def service_cb(request):
 
     c.msg.angular.z = 0
     c.pub.publish(c.msg)
-    print('Im in service callback')
+    #print('Im in service callback')
     
     return correctionServiceMessageResponse("reorientation complete", 0)
 
