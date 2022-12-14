@@ -19,7 +19,6 @@ sectors = ["front_C", "front_L", "left_R", "left_C", "left_L", "back_R", "back_C
 sector_distances = {"front_C":[], "front_L":[], "left_R":[], "left_C":[], "left_L":[], "back_R":[], "back_C":[], "back_L":[], "right_R":[], "right_C":[], "right_L":[], "front_R":[] }
 
 def SectorScan(scan):
-    print("scan samples: " + scan.samples)
     print("scan range: " + len(scan.range))
     # takes in the scan data and records the distance to an obstacle if it detects one
     #looks at the data scanned within the range of each sector
