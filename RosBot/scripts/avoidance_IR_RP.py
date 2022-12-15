@@ -4,6 +4,7 @@ import rospy
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan
 from sensor_msgs.msg import Range
+from RosBot.srv import correctionServiceMessage as csm
 
 counter = 0
 
