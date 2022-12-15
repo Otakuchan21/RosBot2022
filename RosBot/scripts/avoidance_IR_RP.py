@@ -5,6 +5,8 @@ from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan
 from sensor_msgs.msg import Range
 
+counter = 0
+
 normal_linear = 0.2
 
 # obstacles are detected if they are within this range
@@ -58,6 +60,7 @@ def SectorScan(scan):
     action(sector_distances)
 
 def action(sector):
+    global counter
     msg = Twist()
     linear_x = 0
     angular_z = 0
@@ -69,42 +72,59 @@ def action(sector):
     logmessage = {description: angular_z}
 
     if not front_obstacle and not Rfront_obstacle and not Lfront_obstacle:
-
         description = "no obstacle - move straight"
         linear_x = normal_linear
         angular_z = 0
+        counter +=1
     elif front_obstacle and not Rfront_obstacle and not Lfront_obstacle:
         description = "front obstacle - left/right clear"
         linear_x = avoid_linear
         angular_z = avoid_angular if angular_z > 0 else -avoid_angular
+        counter = 0
     elif not front_obstacle and not Rfront_obstacle and Lfront_obstacle:
         description = "left obstacle - front/right clear"
         linear_x = avoid_linear
         angular_z = -avoid_angular
+        counter = 0
     elif not front_obstacle and Rfront_obstacle and not Lfront_obstacle:
         description = "right obstacle - front/left clear"
         linear_x = avoid_linear
         angular_z = avoid_angular
+        counter = 0
     elif front_obstacle and Rfront_obstacle and not Lfront_obstacle:
         description = "left clear - front/right obstacle"
         linear_x = avoid_linear
         angular_z = avoid_angular 
+        counter = 0
     elif front_obstacle and not Rfront_obstacle and Lfront_obstacle:
         description = "right clear - front/left obstacle"
         linear_x = avoid_linear
         angular_z = -avoid_angular
+        counter = 0
     elif not front_obstacle and Rfront_obstacle and Lfront_obstacle:
         description = "front clear - left/right obstacle"
         linear_x = avoid_linear
         angular_z = avoid_angular*2 if angular_z > 0 else -avoid_angular*2 
+        counter = 0
     elif front_obstacle and Rfront_obstacle and Lfront_obstacle:
         description = "none clear"
         linear_x = avoid_linear
         angular_z = avoid_angular*2 if angular_z > 0 else -avoid_angular*2
+        counter = 0
     else:
         description = "unknown"
         linear_x = 0.0
         angular_z = 0.0
+        counter = 0
+    
+    if counter>50:
+        #call service
+        rospy.wait_for_service('correction')
+        service_requester = rospy.ServiceProxy('correction', csm)
+        message = 'initiate orientation sequence'
+        
+        response = service_requester(message)
+        counter = response.counter
     
     logmessage = {description: angular_z}
     #rospy.loginfo(logmessage)
