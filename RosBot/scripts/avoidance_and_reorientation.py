@@ -92,12 +92,12 @@ def action(sector):
 
     if counter>100:
         #call service
+        counter = 0
         rospy.wait_for_service('correction')
         service_requester = rospy.ServiceProxy('correction', csm)
         message = 'initiate orientation sequence'
-        
         response = service_requester(message)
-        counter = response.counter
+        print(response.message)
     
     logmessage = {description: angular_z}
     rospy.loginfo(logmessage)
