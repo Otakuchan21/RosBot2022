@@ -2,8 +2,6 @@
 <include file="$(find rosbot_ekf)/launch/rosserial_bridge.launch"/>
 <include file="$(find rosbot_ekf)/launch/message_conversion.launch"/>
 <include file="$(find rplidar_ros)/launch/rplidar.launch"/>
-<include file="$(find astra_launch)/launch/astra.launch"/>
-<node name="image_view" pkg="image_view" type="image_view" output="screen">
-<remap from="image" to="/camera/rgb/image_raw" />
-</node>
+<include file ="$(find RosBot)/scripts/avoidance_IR_RP.py"/>
+<include file ="$(find RosBot)/scripts/correction_service_server.py"/>
 </launch>

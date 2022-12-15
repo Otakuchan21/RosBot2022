@@ -24,21 +24,15 @@ sector_distances = {"front_C":[], "front_L":[], "left_R":[], "left_C":[], "left_
 
 def IrFrontLeft(scan):
     global front_left
-    print(scan.range)
     x = scan.range
     if (x <= detection_dist and x != 'inf'):
         front_left = True
-        ("reacl")
-        #sector_distances["front_L"] = [x]
     
 def IrFrontRight(scan):
     global front_right
-    print(scan.range)
     x = scan.range
     if (x <= detection_dist and x != 'inf'):
         front_right = True
-        ("reacr")
-        #sector_distances["front_L"] = [x]
 
 def SectorScan(scan):
     global front_left
@@ -50,11 +44,9 @@ def SectorScan(scan):
         sector_distances[sector] = [ x for x in scan.ranges[sector_angle*i : sector_angle*(i+1)] 
                                         if x <= detection_dist and x != 'inf']        #records the distance to the obstacle if it is within the predefined collision range and not infinite
     if (front_left == True):
-        print('reachedl')
         sector_distances["front_L"] = [0.2]
 
     if (front_right == True):
-        print('reachedr')
         sector_distances["front_R"] = [0.2]
 
     action(sector_distances)
@@ -68,7 +60,7 @@ def action(sector):
     front_obstacle = len(sector["front_C"])
     Rfront_obstacle = len(sector["front_R"])
     Lfront_obstacle =  len(sector["front_L"])
-    print(sector)
+
     logmessage = {description: angular_z}
 
     if not front_obstacle and not Rfront_obstacle and not Lfront_obstacle:
@@ -127,9 +119,9 @@ def action(sector):
         counter = response.counter
     
     logmessage = {description: angular_z}
-    #rospy.loginfo(logmessage)
-    #msg.linear.x = linear_x
-    #msg.angular.z = angular_z
+    rospy.loginfo(logmessage)
+    msg.linear.x = linear_x
+    msg.angular.z = angular_z
     pub.publish(msg)
 
 def main():
