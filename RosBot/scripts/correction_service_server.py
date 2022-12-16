@@ -34,27 +34,33 @@ class correction():
         
 
 def service_cb(request):
+    global z_deg
     c = correction()
     r = rospy.Rate(1)
-    global z_deg
-    while not (z_deg<75.0 and z_deg>67.0):
+    while not rospy.is_shutdown():
         print(z_deg)
-        if z_deg > 75.0 or z_deg < 0:
-            c.msg.linear.x = 0
-            c.msg.angular.z = -0.5
-        elif z_deg < 66.0:
-            c.msg.linear.x = 0
-            c.msg.angular.z = 0.5
-        c.pub.publish(c.msg)
-        r.sleep()
-        print(c.msg.angular.z)
-    c.msg.angular.z = 0
-    if c.msg.angular.z ==0:
-        c.pub.publish(c.msg)
-        r.sleep()
-        print('im in 0')
+    
+    if z_deg<79.0 and z_deg>64.0:
+        return correctionServiceMessageResponse("reorientation not needed", 0)
+    else:
+        while not (z_deg<79.0 and z_deg>64.0):
+            print(z_deg)
+            if z_deg > 79.0 or z_deg < 0:
+                c.msg.linear.x = 0
+                c.msg.angular.z = -0.5
+            elif z_deg < 64.0:
+                c.msg.linear.x = 0
+                c.msg.angular.z = 0.5
+            c.pub.publish(c.msg)
+            r.sleep()
+            print(c.msg.angular.z)
+        c.msg.angular.z = 0
+        if c.msg.angular.z ==0:
+            c.pub.publish(c.msg)
+            r.sleep()
+            print('im in 0')
 
-    return correctionServiceMessageResponse("reorientation complete", 0)
+        return correctionServiceMessageResponse("reorientation complete", 0)
 
 
 rospy.init_node("correction")

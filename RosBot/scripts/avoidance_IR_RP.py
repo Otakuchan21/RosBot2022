@@ -8,14 +8,14 @@ from RosBot.srv import correctionServiceMessage as csm
 
 counter = 0
 
-normal_linear = 0.5
+normal_linear = 0.4
 
 # obstacles are detected if they are within this range
-detection_dist = 0.2
+detection_dist = 0.35
 
 # while avoiding an obstacle the rosbot will move back to be able to rotate
 avoid_linear = -0.15
-avoid_angular = 1.1 
+avoid_angular = 0.9 
 front_left = False
 front_right = False
 # divides the rplider scan into 12 section and keeps track of their order, measured distances and deviation costs
@@ -119,7 +119,7 @@ def action(sector):
         angular_z = 0.0
         counter = 0
     
-    if counter>50:
+    if counter>40:
         #call service
         rospy.wait_for_service('correction')
         service_requester = rospy.ServiceProxy('correction', csm)
