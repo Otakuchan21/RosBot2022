@@ -25,37 +25,36 @@ class correction():
     
     def callback(self,data):
         global z_deg
-        r = rospy.Rate(10)
+        
         q_base = data.orientation
         q_list = [q_base.x, q_base.y, q_base.z, q_base.w]
         euler_x, euler_y, euler_z = euler_from_quaternion(q_list)
-        z_deg = abs(math.degrees(euler_z))
-        print('im in subscriber callback')
-        print(z_deg)
-        r.sleep()
+        z_deg = math.degrees(euler_z)
+        #print('im in subscriber callback')
+        
+        
 
 def service_cb(request):
     c = correction()
     r = rospy.Rate(1)
     global z_deg
-    
-    while not (z_deg<99.0 and z_deg>85.0):
-        #print(z_deg)
-        if z_deg > 94.0:
+    while not (z_deg<170 and z_deg>159):
+        print(z_deg)
+        if z_deg > 170.0 or z_deg < 0:
             c.msg.linear.x = 0
             c.msg.angular.z = -0.5
-        if z_deg < 86.0:
+        elif z_deg < 159:
             c.msg.linear.x = 0
             c.msg.angular.z = 0.5
         c.pub.publish(c.msg)
         r.sleep()
         print(c.msg.angular.z)
-    
     c.msg.angular.z = 0
     if c.msg.angular.z ==0:
         c.pub.publish(c.msg)
         r.sleep()
         print('im in 0')
+
     return correctionServiceMessageResponse("reorientation complete", 0)
 
 
