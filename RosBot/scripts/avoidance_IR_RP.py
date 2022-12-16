@@ -8,10 +8,10 @@ from RosBot.srv import correctionServiceMessage as csm
 
 counter = 0
 
-normal_linear = 0.2
+normal_linear = 0.5
 
 # obstacles are detected if they are within this range
-detection_dist = 0.3
+detection_dist = 0.2
 
 # while avoiding an obstacle the rosbot will move back to be able to rotate
 avoid_linear = -0.15
@@ -26,14 +26,22 @@ sector_distances = {"front_C":[], "front_L":[], "left_R":[], "left_C":[], "left_
 def IrFrontLeft(scan):
     global front_left
     x = scan.range
+    print(x)
     if (x <= detection_dist and x != 'inf'):
         front_left = True
-    
+    else:
+        front_left = False
+        print(front_left)
 def IrFrontRight(scan):
     global front_right
+
     x = scan.range
+    print(x)
     if (x <= detection_dist and x != 'inf'):
         front_right = True
+    else:
+        front_right = False
+        print(front_right)
 
 def SectorScan(scan):
     global front_left
@@ -53,6 +61,7 @@ def SectorScan(scan):
     action(sector_distances)
 
 def action(sector):
+    print(sector)
     global counter
     msg = Twist()
     linear_x = 0

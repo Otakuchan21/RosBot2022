@@ -2,7 +2,6 @@
 
 import rospy
 from geometry_msgs.msg import Twist
-from nav_msgs.msg import Odometry as odom
 from sensor_msgs.msg import Imu
 from tf.transformations import euler_from_quaternion
 from RosBot.srv import correctionServiceMessage, correctionServiceMessageResponse
@@ -38,12 +37,12 @@ def service_cb(request):
     c = correction()
     r = rospy.Rate(1)
     global z_deg
-    while not (z_deg<170 and z_deg>159):
+    while not (z_deg<75.0 and z_deg>67.0):
         print(z_deg)
-        if z_deg > 170.0 or z_deg < 0:
+        if z_deg > 75.0 or z_deg < 0:
             c.msg.linear.x = 0
             c.msg.angular.z = -0.5
-        elif z_deg < 159:
+        elif z_deg < 66.0:
             c.msg.linear.x = 0
             c.msg.angular.z = 0.5
         c.pub.publish(c.msg)
