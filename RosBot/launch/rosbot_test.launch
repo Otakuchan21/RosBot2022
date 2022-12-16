@@ -1,0 +1,7 @@
+<launch>
+<include file="$(find rosbot_ekf)/launch/rosserial_bridge.launch"/>
+<include file="$(find rosbot_ekf)/launch/message_conversion.launch"/>
+<include file="$(find rplidar_ros)/launch/rplidar.launch"/>
+
+
+</launch>
