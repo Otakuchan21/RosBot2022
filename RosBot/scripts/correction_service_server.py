@@ -2,17 +2,18 @@
 
 import rospy
 from geometry_msgs.msg import Twist
-from sensor_msgs.msg import Imu
+from nav_msgs.msg import Odometry as odom
 from tf.transformations import euler_from_quaternion
 from RosBot.srv import correctionServiceMessage, correctionServiceMessageResponse
 import math
-z_deg = 0
+
 class correction():
     def __init__(self):
         self.pub = rospy.Publisher("cmd_vel", Twist, queue_size = 10)
-        self.sub = rospy.Subscriber('/imu', Imu, self.callback)
+        self.sub = rospy.Subscriber('/odom', odom, self.callback)
         self.msg = Twist()
         self.velocityValue()
+        self.z_deg = 0
         self.initial_z = 0.0
         self.flag = True
 
@@ -24,49 +25,40 @@ class correction():
         self.msg.angular.y = 0
         self.msg.angular.z = 0
     
-    def callback(self,data):
-        global z_deg
-        
-        q_base = data.orientation
+    def callback(self, data):
+        q_base = data.pose.pose.orientation
         q_list = [q_base.x, q_base.y, q_base.z, q_base.w]
         euler_x, euler_y, euler_z = euler_from_quaternion(q_list)
-        z_deg = math.degrees(euler_z)
-        #print('im in subscriber callback')
+        self.z_deg = math.degrees(euler_z)
         if self.flag == True:
-            self.inital_z = z_deg
+            self.initial_z = self.z_deg
+            print('initial z angle:', self.initial_z)
             self.flag = False
-        
-        
-
-def service_cb(request):
-    global z_deg
-    c = correction()
-    r = rospy.Rate(1)
-    ul = c.initial_z + 5
-    ll = c.initial_z - 5
-    if z_deg<ul and z_deg>ll:
-        return correctionServiceMessageResponse("reorientation not needed", 0)
-    else:
-        while not (z_deg<ul and z_deg>ll):
-            print(z_deg)
-            if z_deg > ul or z_deg < 0:
-                c.msg.linear.x = 0
-                c.msg.angular.z = -0.5
-            elif z_deg < ll:
-                c.msg.linear.x = 0
-                c.msg.angular.z = 0.5
-            c.pub.publish(c.msg)
+    
+    def service_cb(self, request):
+        ul = self.initial_z + 5.0
+        ll = self.initial_z - 5.0
+        r = rospy.Rate(1)
+        while not (abs(self.z_deg)< ul and self.z_deg> ll):
+            #print(self.z_deg)
+            if abs(self.z_deg) > ul:
+                self.msg.linear.x = 0
+                self.msg.angular.z = -0.5
+            elif self.z_deg < ll:
+                self.msg.linear.x = 0
+                self.msg.angular.z = 0.5
+            self.pub.publish(self.msg)
             r.sleep()
-            print(c.msg.angular.z)
-        c.msg.angular.z = 0
-        if c.msg.angular.z ==0:
-            c.pub.publish(c.msg)
-            r.sleep()
-            print('im in 0')
 
+        self.msg.angular.z = 0
+        self.pub.publish(self.msg)
+        r.sleep()
+        print('Im in service callback')
         return correctionServiceMessageResponse("reorientation complete", 0)
 
 
-rospy.init_node("correction")
-service = rospy.Service('correction', correctionServiceMessage, service_cb)
-rospy.spin()
+if __name__=="__main__":
+    rospy.init_node("correction")
+    o = correction()
+    service = rospy.Service('correction', correctionServiceMessage, o.service_cb)
+    rospy.spin()
