@@ -13,6 +13,8 @@ class correction():
         self.sub = rospy.Subscriber('/imu', Imu, self.callback)
         self.msg = Twist()
         self.velocityValue()
+        self.initial_z = 0.0
+        self.flag = True
 
     def velocityValue(self):
         self.msg.linear.x = 0
@@ -30,6 +32,9 @@ class correction():
         euler_x, euler_y, euler_z = euler_from_quaternion(q_list)
         z_deg = math.degrees(euler_z)
         #print('im in subscriber callback')
+        if self.flag == True:
+            self.inital_z = z_deg
+            self.flag = False
         
         
 
@@ -37,18 +42,17 @@ def service_cb(request):
     global z_deg
     c = correction()
     r = rospy.Rate(1)
-    while not rospy.is_shutdown():
-        print(z_deg)
-    
-    if z_deg<79.0 and z_deg>64.0:
+    ul = c.initial_z + 5
+    ll = c.initial_z - 5
+    if z_deg<ul and z_deg>ll:
         return correctionServiceMessageResponse("reorientation not needed", 0)
     else:
-        while not (z_deg<79.0 and z_deg>64.0):
+        while not (z_deg<ul and z_deg>ll):
             print(z_deg)
-            if z_deg > 79.0 or z_deg < 0:
+            if z_deg > ul or z_deg < 0:
                 c.msg.linear.x = 0
                 c.msg.angular.z = -0.5
-            elif z_deg < 64.0:
+            elif z_deg < ll:
                 c.msg.linear.x = 0
                 c.msg.angular.z = 0.5
             c.pub.publish(c.msg)
