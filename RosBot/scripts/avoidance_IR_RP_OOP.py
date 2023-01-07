@@ -62,75 +62,77 @@ class avoidance():
 
     def action(self):
         msg = Twist()
+        r = rospy.Rate(1)
         linear_x = 0
         angular_z = 0
         description = ""
-        front_obstacle = len(self.sector["front_C"])
-        Rfront_obstacle = len(self.sector["front_R"])
-        Lfront_obstacle =  len(self.sector["front_L"])
+        front_obstacle = len(self.sector_distances["front_C"])
+        Rfront_obstacle = len(self.sector_distances["front_R"])
+        Lfront_obstacle =  len(self.sector_distances["front_L"])
         #print(sector)
         logmessage = {description: angular_z}
 
         if not front_obstacle and not Rfront_obstacle and not Lfront_obstacle:
             description = "no obstacle - move straight"
-            linear_x = normal_linear
+            linear_x = self.normal_linear
             angular_z = 0
-            counter +=1
+            self.counter +=1
         elif front_obstacle and not Rfront_obstacle and not Lfront_obstacle:
             description = "front obstacle - left/right clear"
-            linear_x = avoid_linear
-            angular_z = avoid_angular 
-            counter = 0
+            linear_x = self.avoid_linear
+            angular_z = self.avoid_angular 
+            self.counter = 0
         elif not front_obstacle and not Rfront_obstacle and Lfront_obstacle:
             description = "left obstacle - front/right clear"
-            linear_x = avoid_linear
-            angular_z = -avoid_angular
-            counter = 0
+            linear_x = self.avoid_linear
+            angular_z = -self.avoid_angular
+            self.counter = 0
         elif not front_obstacle and Rfront_obstacle and not Lfront_obstacle:
             description = "right obstacle - front/left clear"
-            linear_x = avoid_linear
-            angular_z = avoid_angular
-            counter = 0
+            linear_x = self.avoid_linear
+            angular_z = self.avoid_angular
+            self.counter = 0
         elif front_obstacle and Rfront_obstacle and not Lfront_obstacle:
             description = "left clear - front/right obstacle"
-            linear_x = avoid_linear
-            angular_z = avoid_angular 
-            counter = 0
+            linear_x = self.avoid_linear
+            angular_z = self.avoid_angular 
+            self.counter = 0
         elif front_obstacle and not Rfront_obstacle and Lfront_obstacle:
             description = "right clear - front/left obstacle"
-            linear_x = avoid_linear
-            angular_z = -avoid_angular
-            counter = 0
+            linear_x = self.avoid_linear
+            angular_z = -self.avoid_angular
+            self.counter = 0
         elif not front_obstacle and Rfront_obstacle and Lfront_obstacle:
             description = "front clear - left/right obstacle"
-            linear_x = avoid_linear
-            angular_z = avoid_angular
-            counter = 0
+            linear_x = self.avoid_linear
+            angular_z = self.avoid_angular
+            self.counter = 0
         elif front_obstacle and Rfront_obstacle and Lfront_obstacle:
             description = "none clear"
-            linear_x = avoid_linear
-            angular_z = avoid_angular
-            counter = 0
+            linear_x = self.avoid_linear
+            angular_z = self.avoid_angular
+            self.counter = 0
         else:
             description = "unknown"
             linear_x = 0.0
             angular_z = 0.0
-            counter = 0
+            self.counter = 0
         
-        if counter>50:
+        if self.counter>50:
             #call service
             rospy.wait_for_service('correction')
             service_requester = rospy.ServiceProxy('correction', csm)
             message = 'initiate orientation sequence'
             
             response = service_requester(message)
-            counter = response.counter
+            self.counter = response.counter
         
         logmessage = {description: angular_z}
         rospy.loginfo(logmessage)
         msg.linear.x = linear_x
         msg.angular.z = angular_z
         self.pub.publish(msg)
+        r.sleep()
 
 def main():
     rospy.init_node('avoidance')
@@ -138,7 +140,6 @@ def main():
     obj = avoidance()
     while not rospy.is_shutdown():
         obj.action()
-        rate.sleep()
 
 if __name__ == '__main__':
     main()
