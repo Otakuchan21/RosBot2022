@@ -2,6 +2,6 @@
 <include file="$(find rosbot_ekf)/launch/rosserial_bridge.launch"/>
 <include file="$(find rosbot_ekf)/launch/message_conversion.launch"/>
 <include file="$(find rplidar_ros)/launch/rplidar.launch"/>
-<node name="avoidance"  pkg="RosBot" type = "avoidance_IR_RP.py" />
+<node name="avoidance"  pkg="RosBot" type = "avoidance_IR_RP_OOP.py" />
 <node name="correction" pkg="RosBot" type = "correction_service_server.py" />
 </launch>
