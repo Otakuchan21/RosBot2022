@@ -4,14 +4,18 @@ import rospy
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan
 from sensor_msgs.msg import Range
+from nav_msgs.msg import Odometry as odom
 from RosBot.srv import correctionServiceMessage as csm
+import math
+import time 
 
 class avoidance():
-    def __init__(self):
+    def __init__(self, start):
         self.Laser_sub = rospy.Subscriber('/scan', LaserScan, self.SectorScan)
         self.IRL_sub = rospy.Subscriber('/range/fl', Range, self.IrFrontLeft)
         self.IRR_sub = rospy.Subscriber('/range/fr', Range, self.IrFrontRight)
         self.pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
+        self.odom_sub = rospy.Subscriber('/odom', odom, self.odom_cb)
         self.counter = 0
         self.normal_linear = 0.2
         # obstacles are detected if they are within this range
@@ -21,10 +25,33 @@ class avoidance():
         self.avoid_angular = 1.1 
         self.front_left = False
         self.front_right = False
+        self.flag = True
+        self.current_x = 0
+        self.current_y = 0
+        self.initial_x = 0
+        self.initial_y = 0
+        self.total_distance = 0
+        self.start = start
+        self.end = 0
+        self.total_time = 0
         # divides the rplider scan into 12 section and keeps track of their order, measured distances and deviation costs
         self.sector_angle = 30
         self.sectors = ["front_C", "front_L", "left_R", "left_C", "left_L", "back_R", "back_C", "back_L", "right_R", "right_C", "right_L", "front_R"]
         self.sector_distances = {"front_C":[], "front_L":[], "left_R":[], "left_C":[], "left_L":[], "back_R":[], "back_C":[], "back_L":[], "right_R":[], "right_C":[], "right_L":[], "front_R":[] }
+
+    def odom_cb(self, data):
+        self.current_x = data.pose.pose.position.x 
+        self.current_y = data.pose.pose.position.y 
+        if self.flag == True:
+            self.initial_x = data.pose.pose.position.x
+            self.initial_y = data.pose.pose.position.y
+            self.flag = False
+
+    def compute_distance(self):
+        self.total_distance += math.sqrt((self.current_x-self.initial_x)**2 + (self.current_y - self.initial_y)**2)
+        print(self.total_distance)
+        self.initial_x = self.current_x
+        self.initial_y = self.current_y
 
 
     def IrFrontLeft(self, scan):
@@ -118,7 +145,7 @@ class avoidance():
             angular_z = 0.0
             self.counter = 0
         
-        if self.counter>50:
+        if self.counter>20:
             #call service
             rospy.wait_for_service('correction')
             service_requester = rospy.ServiceProxy('correction', csm)
@@ -133,11 +160,18 @@ class avoidance():
         msg.angular.z = angular_z
         self.pub.publish(msg)
         r.sleep()
+        self.end = time.time()
+        self.total_time = self.end-self.start
+        self.compute_distance()
+        rospy.loginfo("total time taken %d", self.total_time)
+        rospy.loginfo("total distance covered %f", self.total_distance)
+        
 
 def main():
     rospy.init_node('avoidance')
     rate = rospy.Rate(5)
-    obj = avoidance()
+    start = time.time()
+    obj = avoidance(start)
     while not rospy.is_shutdown():
         obj.action()
 
